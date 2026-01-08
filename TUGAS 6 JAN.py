@@ -1,8 +1,6 @@
 import streamlit as st
 
-# ===============================
 # FUNGSI HITUNG LUAS
-# ===============================
 def luas_segitiga(a, t):
     return (a * t) / 2
 
@@ -12,10 +10,7 @@ def luas_persegi_panjang(p, l):
 def luas_jajar_genjang(a, t):
     return a * t
 
-
-# ===============================
 # FUNGSI HITUNG KELILING
-# ===============================
 def keliling_segitiga(a, b, c):
     return a + b + c
 
@@ -25,10 +20,7 @@ def keliling_persegi_panjang(p, l):
 def keliling_jajar_genjang(a, b):
     return 2 * (a + b)
 
-
-# ===============================
 # DICTIONARY RUMUS
-# ===============================
 hitungLuas = {
     "Luas Segitiga": {
         "Fungsi": luas_segitiga,
@@ -59,10 +51,6 @@ hitungKeliling = {
     }
 }
 
-
-# ===============================
-# STREAMLIT UI
-# ===============================
 st.title("Aplikasi Hitung Bangun Datar")
 
 opt = st.selectbox(
