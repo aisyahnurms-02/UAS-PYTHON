@@ -1,7 +1,7 @@
 import streamlit as st
 st.title("Kalkulator Pembagian")
 
-angka_input = st.text_input("Masukam angka:")
+angka_input = st.text_input("Masukan angka:")
 angka_bagi = st.text_input("Masukan angka bagi :")
 if angka_input:
   try:
