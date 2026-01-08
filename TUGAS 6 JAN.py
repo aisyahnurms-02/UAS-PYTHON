@@ -58,7 +58,6 @@ if (option == 'Hitung Luas'):
   allRumus = hitungluas
 else:
   allRumus = hitungkeliling
-
 return allRumus
 
 opt = st.selectbox(
