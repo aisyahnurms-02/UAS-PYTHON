@@ -54,12 +54,12 @@ opt = st.selectbox(
 def pilih_rumus(option):
   allRumus = {}
 
-if (option == 'Hitung Luas'):
-  allRumus = hitungluas
-else:
+  if (option == 'Hitung Luas'):
+    allRumus = hitungluas
+  else:
     allRumus = hitungKeliling
 
-return allRumus
+  return allRumus
 
 opt = st.selectbox(
   label="Pilih operasi perhitungan",
