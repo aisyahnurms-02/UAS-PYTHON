@@ -57,7 +57,8 @@ def pilih_rumus(option):
 if (option == 'Hitung Luas'):
   allRumus = hitungluas
 else:
-  allRumus = hitungkeliling
+    allRumus = hitungKeliling
+
 return allRumus
 
 opt = st.selectbox(
