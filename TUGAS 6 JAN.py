@@ -1,40 +1,4 @@
 import streamlit as st
-st.title("Aplikasi Hitung Bangun Datar")
-
-opt = st.selectbox(
-  label="Pilih operasi perhitungan",
-  options=['Hitung Luas', 'Hitung keliling'] 
-)
-
-def pilih_rumus(option):
-  allRumus = {}
-
-if (option == 'Hitung Luas'):
-  allRumus = hitungluas
-else:
-  allRumus = hitungkeliling
-
-return allRumus
-
-opt = st.selectbox(
-  label="Pilih operasi perhitungan",
-  options=['Hitung Luas', 'Hitung Keliling']
-)
-
-allRumus = pilih_rumus(opt)
-
-pilih_hitung = st.radio(
-  label='Pilih Hitung',
-  options=a_rumus.keys(),
-horizontal=True
-)
-inputs = [st.number_input(label, value=0.0) for label in all_rumus[pilih_hitung]["inputan"]
-          
-if st.button('Hitung'):
-    hasil = all_Rumus[pilih_hitung]["Fungsi"](*inputs)
-    st.markdown(f'<h2 style="color:green; text-align:center;">Hasil: {hasil})</h2',
-                unsafe_allow_html=True)
-
 # Hitung Luas
 def luas_segitiga(a, t):
   return (a * t) / 2
@@ -80,4 +44,39 @@ hitungKeliling = {
   },
 }
 
+st.title("Aplikasi Hitung Bangun Datar")
+
+opt = st.selectbox(
+  label="Pilih operasi perhitungan",
+  options=['Hitung Luas', 'Hitung keliling'] 
+)
+
+def pilih_rumus(option):
+  allRumus = {}
+
+if (option == 'Hitung Luas'):
+  allRumus = hitungluas
+else:
+  allRumus = hitungkeliling
+
+return allRumus
+
+opt = st.selectbox(
+  label="Pilih operasi perhitungan",
+  options=['Hitung Luas', 'Hitung Keliling']
+)
+
+allRumus = pilih_rumus(opt)
+
+pilih_hitung = st.radio(
+  label='Pilih Hitung',
+  options=a_rumus.keys(),
+horizontal=True
+)
+inputs = [st.number_input(label, value=0.0) for label in all_rumus[pilih_hitung]["inputan"]
+          
+if st.button('Hitung'):
+    hasil = all_Rumus[pilih_hitung]["Fungsi"](*inputs)
+    st.markdown(f'<h2 style="color:green; text-align:center;">Hasil: {hasil})</h2',
+                unsafe_allow_html=True)
 
