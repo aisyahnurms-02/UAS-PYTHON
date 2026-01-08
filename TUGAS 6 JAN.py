@@ -28,9 +28,8 @@ pilih_hitung = st.radio(
   options=a_rumus.keys(),
 horizontal=True
 )
-
 inputs = [st.number_input(label, value=0.0) for label in all_rumus[pilih_hitung]["inputan"]
-
+          
 if st.button('Hitung'):
     hasil = all_Rumus[pilih_hitung]["Fungsi"](*inputs)
     st.markdown(f'<h2 style="color:green; text-align:center;">Hasil: {hasil})</h2',
