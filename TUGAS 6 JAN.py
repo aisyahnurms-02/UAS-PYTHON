@@ -25,7 +25,7 @@ allRumus = pilih_rumus(opt)
 
 pilih_hitung = st.radio(
   label='Pilih Hitung',
-  options=a;;_rumus.keys(),
+  options=a;_rumus.keys(),
 horizontal=True
 
 inputs = [st.number_input(label, value=0.0) for label in all_rumus[pilih_hitung]["inputan"]
