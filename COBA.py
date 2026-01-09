@@ -154,7 +154,6 @@ def ekp_cipher(text, encrypt=True):
 # --- 4. TAMPILAN (LAYOUT) ---
 
 st.markdown("<h1 style='text-align: center;'>ALGORITMA KREASI</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size: 12px; margin-top: -15px;'>Metode Substitusi Lagu + Transposisi + Ekspansi Karakter Polialfanumerik</p>", unsafe_allow_html=True)
 
 st.write("Masukkan Teks:")
 input_text = st.text_area("", height=100, label_visibility="collapsed")
