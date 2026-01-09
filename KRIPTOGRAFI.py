@@ -1,110 +1,61 @@
 import streamlit as st
 import math
 
-# --- 1. KONFIGURASI HALAMAN ---
-st.set_page_config(
-    page_title="Kriptografi",
-    layout="centered" # Penting agar posisi default di tengah
-)
+# --- 1. CONFIG ---
+st.set_page_config(page_title="Kriptografi", layout="centered")
 
-# --- 2. CSS "CARD UI" (Kotak Besar di Tengah) ---
+# --- 2. CSS ---
 st.markdown("""
-    <style>
-    /* 1. Background Halaman Utama (Luar Kotak) - Tetap Ungu */
-    .stApp {
-        background: linear-gradient(180deg, #6a11cb 0%, #2575fc 100%);
-        background-attachment: fixed;
-    }
-
-    /* 2. Mengatur Container Utama menjadi "KOTAK BESAR" (Card) */
-    div.block-container {
-        background-color: rgba(255, 255, 255, 0.95); /* Putih sedikit transparan */
-        padding: 3rem;       /* Jarak dalam kotak */
-        border-radius: 25px; /* Sudut membulat */
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Bayangan hitam di belakang kotak */
-        max-width: 700px;    /* Lebar maksimal kotak agar terlihat rapi */
-        margin-top: 2rem;
-    }
-
-    /* 3. Memastikan SEMUA TEKS di dalam kotak berwarna HITAM/GELAP */
-    h1, h2, h3, h4, h5, p, label, div, span, .stMarkdown {
-        color: #333333 !important;
-    }
-    
-    /* Judul Utama */
-    h1 {
-        text-align: center;
-        font-weight: 800;
-        color: #4b0082 !important; /* Ungu gelap */
-        margin-bottom: 30px;
-        text-shadow: none; /* Hapus shadow jika ada sisa */
-    }
-
-    /* 4. Styling Input Fields (Agar border jelas) */
-    .stTextInput input, .stTextArea textarea {
-        background-color: #f8f9fa !important;
-        color: #000000 !important;
-        border: 2px solid #d1d1d1 !important;
-        border-radius: 10px;
-    }
-    .stTextInput input:focus, .stTextArea textarea:focus {
-        border-color: #4b0082 !important; /* Border ungu saat diklik */
-    }
-    
-    /* 5. Styling Tombol */
-    /* Tombol Enkripsi (Kiri) */
-    div[data-testid="column"]:nth-of-type(2) button {
-        background-color: #aa00ff !important; /* Ungu Neon */
-        color: white !important;
-        border: none;
-        height: 50px;
-        font-weight: bold;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-    
-    /* Tombol Dekripsi (Kanan) */
-    div[data-testid="column"]:nth-of-type(3) button {
-        background-color: #004ba0 !important; /* Biru Gelap */
-        color: white !important;
-        border: none;
-        height: 50px;
-        font-weight: bold;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-
-    /* 6. Styling Kotak Hasil */
-    code {
-        color: #d63384 !important; /* Warna teks hasil pink/ungu */
-        background-color: #f1f1f1 !important; /* Background hasil abu terang */
-        font-weight: bold;
-        border: 1px dashed #4b0082;
-    }
-    
-    /* Sembunyikan elemen bawaan */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    
-    </style>
+<style>
+.stApp {
+    background: linear-gradient(180deg, #4b0082 0%, #2e004f 100%);
+}
+h1, h2, h3, p, label, .stMarkdown, span {
+    color: #FFFFFF !important;
+}
+h1 {
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.3);
+}
+.stTextInput input, .stTextArea textarea {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-radius: 8px;
+}
+div.stButton > button {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    height: 45px;
+    font-weight: bold;
+    width: 100%;
+}
+code {
+    background-color: #1a1a1a !important;
+    color: #00ff00 !important;
+}
+#MainMenu, footer, header {visibility: hidden;}
+</style>
 """, unsafe_allow_html=True)
 
-# --- 3. LOGIKA KRIPTOGRAFI ---
+# --- 3. LOGIKA ---
+
+def validasi_durasi(durasi):
+    try:
+        float(durasi)
+        return True
+    except ValueError:
+        return False
 
 def get_shift_value(judul, durasi):
     judul_clean = ''.join(filter(str.isalpha, judul))
     len_judul = len(judul_clean)
     durasi_clean = durasi.replace(".", "").replace(":", "")
-    try:
-        val_durasi = int(durasi_clean)
-    except ValueError:
-        val_durasi = 0
-    total = len_judul + val_durasi
-    shift = total % 26
-    return shift
+    val_durasi = int(durasi_clean)
+    return (len_judul + val_durasi) % 26
 
 def substitution_cipher(text, shift, encrypt=True):
     result = ""
-    if not encrypt: shift = -shift
+    if not encrypt:
+        shift = -shift
     for char in text:
         if char.isalpha():
             start = ord('A') if char.isupper() else ord('a')
@@ -114,38 +65,31 @@ def substitution_cipher(text, shift, encrypt=True):
     return result
 
 def transposition_cipher(text, key_str, encrypt=True):
-    if not key_str.isdigit(): return text
-    key_str = key_str[:4]
-    key = [int(k) for k in key_str]
+    if not key_str.isdigit():
+        return text
+    key = [int(k) for k in key_str[:4]]
     num_cols = len(key)
-    if num_cols == 0: return text
     key_order = sorted(range(len(key)), key=lambda k: key[k])
-    
+
     if encrypt:
         num_rows = math.ceil(len(text) / num_cols)
         padded_text = text.ljust(num_rows * num_cols, '_')
-        grid = []
-        for r in range(num_rows):
-            grid.append(list(padded_text[r*num_cols : (r+1)*num_cols]))
+        grid = [list(padded_text[i*num_cols:(i+1)*num_cols]) for i in range(num_rows)]
         cipher = ""
-        for col_idx in key_order:
-            for row in range(num_rows):
-                cipher += grid[row][col_idx]
+        for col in key_order:
+            for row in grid:
+                cipher += row[col]
         return cipher.replace('_', '')
     else:
         num_rows = math.ceil(len(text) / num_cols)
         grid = [['' for _ in range(num_cols)] for _ in range(num_rows)]
         idx = 0
-        for k_idx in key_order:
-            for r in range(num_rows):
+        for col in key_order:
+            for row in range(num_rows):
                 if idx < len(text):
-                    grid[r][k_idx] = text[idx]
+                    grid[row][col] = text[idx]
                     idx += 1
-        plain = ""
-        for r in range(num_rows):
-            for c in range(num_cols):
-                plain += grid[r][c]
-        return plain.rstrip('_')
+        return ''.join(''.join(row) for row in grid).rstrip('_')
 
 def ekp_cipher(text, encrypt=True):
     ekp_map = {
@@ -153,99 +97,65 @@ def ekp_cipher(text, encrypt=True):
         'F': '+6?', 'G': '<7>', 'H': '#8', 'I': '9!', 'J': '{1}0',
         'K': '1-1-', 'L': '`12~', 'M': ':1;3', 'N': '1,4<', 'O': 'Ø15',
         'P': '_1-6', 'Q': '1=7+', 'R': '1®8', 'S': '#1#9', 'T': '2@0@',
-        'U': '2**1', 'V': '%2√2', 'W': '3&2∑', 'X': '2×4!!', 'Y': '^2¥5^', 'Z': '2Ω6$',
-        ' ': '_', '_': '~'
+        'U': '2**1', 'V': '%2√2', 'W': '3&2∑', 'X': '2×4!!', 'Y': '^2¥5^', 'Z': '2Ω6$'
     }
-    
     if encrypt:
-        hasil = ""
-        for char in text:
-            upper_char = char.upper()
-            if upper_char in ekp_map:
-                hasil += ekp_map[upper_char]
-            else:
-                hasil += char
-        return hasil
-    else:
-        reverse_map = {v: k for k, v in ekp_map.items()}
-        sorted_symbols = sorted(reverse_map.keys(), key=len, reverse=True)
-        hasil = ""
-        i = 0
-        while i < len(text):
-            match = False
-            for sym in sorted_symbols:
-                if text.startswith(sym, i):
-                    hasil += reverse_map[sym]
-                    i += len(sym)
-                    match = True
-                    break
-            if not match:
-                hasil += text[i]
-                i += 1
-        return hasil
+        return ''.join(ekp_map.get(c.upper(), c) for c in text)
+    reverse_map = {v: k for k, v in ekp_map.items()}
+    sorted_keys = sorted(reverse_map, key=len, reverse=True)
+    hasil, i = "", 0
+    while i < len(text):
+        for k in sorted_keys:
+            if text.startswith(k, i):
+                hasil += reverse_map[k]
+                i += len(k)
+                break
+        else:
+            hasil += text[i]
+            i += 1
+    return hasil
 
-# --- 4. TAMPILAN UTAMA (UI) ---
+# --- 4. TAMPILAN ---
 
-st.title("ALGORITMA KREASI")
+st.markdown("<h1 style='text-align:center;'>ALGORITMA KREASI</h1>", unsafe_allow_html=True)
+input_text = st.text_area("Masukkan Teks")
 
-# Input Utama
-st.markdown("### Masukkan Teks (Plaintext/Ciphertext):")
-input_text = st.text_area("", height=100, placeholder="Ketik amikom...", label_visibility="collapsed")
-
-# Konfigurasi
-st.markdown("### Konfigurasi Kunci:")
 c1, c2, c3 = st.columns(3)
 with c1:
-    judul_lagu = st.text_input("Judul Lagu", placeholder="Separuh Nafas")
+    judul_lagu = st.text_input("Judul Lagu")
 with c2:
-    durasi_lagu = st.text_input("Durasi", placeholder="4.14")
+    durasi_lagu = st.text_input("Durasi", placeholder="Contoh: 3.12")
 with c3:
-    key_trans = st.text_input("Key Transposisi", placeholder="1234", max_chars=4)
+    key_trans = st.text_input("Key Transposisi")
 
-st.write("") # Spacer
+col1, col2 = st.columns(2)
+with col1:
+    enc_btn = st.button("ENKRIPSI")
+with col2:
+    dec_btn = st.button("DEKRIPSI / RESET")
 
-# Tombol
-col_l, btn_enc, btn_dec, col_r = st.columns([0.1, 2, 2, 0.1])
-with btn_enc:
-    do_encrypt = st.button("Enkripsi", use_container_width=True)
-with btn_dec:
-    do_decrypt = st.button("Dekripsi", use_container_width=True)
+result = ""
 
-# Logika
-final_res = ""
-status_msg = ""
+if enc_btn or dec_btn:
+    if not validasi_durasi(durasi_lagu):
+        st.error("Durasi harus berupa angka dan boleh menggunakan titik.")
+    elif input_text and judul_lagu and durasi_lagu and key_trans:
+        if enc_btn:
+            result = ekp_cipher(
+                transposition_cipher(
+                    substitution_cipher(input_text, get_shift_value(judul_lagu, durasi_lagu), True),
+                    key_trans, True),
+                True)
+            st.success("Enkripsi Berhasil")
+        else:
+            result = substitution_cipher(
+                transposition_cipher(
+                    ekp_cipher(input_text, False),
+                    key_trans, False),
+                get_shift_value(judul_lagu, durasi_lagu), False)
+            st.info("Dekripsi Berhasil")
 
-if do_encrypt and input_text and judul_lagu and durasi_lagu and key_trans:
-    s1 = substitution_cipher(input_text, get_shift_value(judul_lagu, durasi_lagu), True)
-    s2 = transposition_cipher(s1, key_trans, True)
-    final_res = ekp_cipher(s2, True)
-    status_msg = "Enkripsi Berhasil"
+if result:
+    st.code(result)
 
-elif do_decrypt and input_text and judul_lagu and durasi_lagu and key_trans:
-    s1 = ekp_cipher(input_text, False)
-    s2 = transposition_cipher(s1, key_trans, False)
-    final_res = substitution_cipher(s2, get_shift_value(judul_lagu, durasi_lagu), False)
-    status_msg = "Dekripsi Berhasil"
-
-# Hasil
-if final_res:
-    if status_msg == "Enkripsi Berhasil":
-        st.success(status_msg)
-    else:
-        st.info(status_msg)
-        
-    st.markdown("### Hasil:")
-    st.code(final_res)
-    
-    st.markdown("""
-        <div style='text-align: center; margin-top: 20px; font-size: 12px; color: #888;'>
-            create by Aisyah Nur Maya Silviyani
-        </div>
-    """, unsafe_allow_html=True)
-
-elif not final_res:
-    st.markdown("""
-        <div style='text-align: center; margin-top: 40px; font-size: 12px; color: #888;'>
-            create by Aisyah Nur Maya Silviyani
-        </div>
-    """, unsafe_allow_html=True)
+st.markdown("<div style='text-align:center; font-size:12px; color:#888;'>create by Aisyah Nur Maya Silviyani</div>", unsafe_allow_html=True)
