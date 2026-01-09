@@ -3,90 +3,93 @@ import math
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
-    page_title="Crypto Aisyah",
+    page_title="Crypto Aisyah 💖",
     layout="centered",
-    page_icon="💜"
+    page_icon="🌸"
 )
 
-# --- CUSTOM CSS (TEMA GELAP / CRYPTO) ---
+# --- CUSTOM CSS TEMA KIYUT ---
 st.markdown("""
 <style>
 .stApp {
-    background: linear-gradient(180deg, #020617 0%, #020617 100%);
-    color: #e5e7eb;
+    background: linear-gradient(180deg, #fce7f3 0%, #e9d5ff 100%);
 }
 
 /* Card utama */
 div[data-testid="block-container"] {
-    background-color: #020617;
+    background-color: #ffffff;
     padding: 3rem;
-    border-radius: 18px;
-    box-shadow: 0 0 30px rgba(37,99,235,0.25);
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(236,72,153,0.25);
     margin-top: 40px;
     max-width: 720px;
 }
 
 /* Judul */
 h1 {
-    color: #60a5fa;
+    color: #db2777;
     text-align: center;
     font-weight: 800;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 .subtitle {
     text-align: center;
-    color: #94a3b8;
+    color: #9333ea;
     margin-bottom: 2rem;
+    font-size: 0.95rem;
 }
 
-/* Label input */
+/* Label */
 label {
-    color: #e5e7eb !important;
+    color: #7c2d12 !important;
     font-weight: 600;
 }
 
 /* Input */
 textarea, input {
-    background-color: #020617 !important;
-    color: #e5e7eb !important;
-    border: 1px solid #334155 !important;
-    border-radius: 6px;
+    background-color: #fff1f2 !important;
+    color: #831843 !important;
+    border: 2px solid #f9a8d4 !important;
+    border-radius: 12px !important;
 }
 
 /* Tombol */
 div.stButton > button[kind="primary"] {
-    background: #2563eb;
+    background: linear-gradient(90deg, #ec4899, #d946ef);
     color: white;
     font-weight: bold;
+    border-radius: 14px;
     width: 100%;
 }
 div.stButton > button[kind="primary"]:hover {
-    background: #1d4ed8;
+    background: linear-gradient(90deg, #db2777, #c026d3);
 }
 
 div.stButton > button[kind="secondary"] {
-    background: #334155;
-    color: white;
+    background: #fbcfe8;
+    color: #831843;
     font-weight: bold;
+    border-radius: 14px;
     width: 100%;
 }
 div.stButton > button[kind="secondary"]:hover {
-    background: #475569;
+    background: #f9a8d4;
 }
 
 /* Hasil */
 .result-label {
     font-weight: bold;
-    color: #93c5fd;
+    color: #be185d;
     margin-top: 25px;
 }
 
 .result-box {
-    background-color: #000000;
-    border: 1px solid #22c55e;
-    border-radius: 10px;
+    background-color: #fff1f2;
+    border: 2px dashed #f472b6;
+    border-radius: 18px;
     padding: 16px;
-    color: #22c55e;
+    color: #9d174d;
     font-family: monospace;
     font-size: 1.05rem;
     min-height: 60px;
@@ -96,9 +99,10 @@ div.stButton > button[kind="secondary"]:hover {
 /* Footer */
 .credit-text {
     text-align: center;
-    color: #64748b;
+    color: #a855f7;
     font-size: 12px;
     margin-top: 25px;
+    font-style: italic;
 }
 
 /* Hilangkan menu bawaan */
@@ -108,7 +112,7 @@ div.stButton > button[kind="secondary"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
-# --- LOGIKA KRIPTOGRAFI (TIDAK DIUBAH) ---
+# --- LOGIKA KRIPTOGRAFI (TETAP SAMA) ---
 
 def hitung_shift_key(judul_lagu, durasi_menit):
     jumlah_huruf = len(judul_lagu.replace(" ", ""))
@@ -154,36 +158,36 @@ def enkripsi_ekp(text):
 
 # --- UI ---
 
-st.markdown("<h1>Kriptografi Aisyah</h1>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Substitusi • Transposisi • EKP</div>", unsafe_allow_html=True)
+st.markdown("<h1>🌸 Kriptografi Aisyah 🌸</h1>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Substitusi • Transposisi • EKP (versi kiyut)</div>", unsafe_allow_html=True)
 
-plaintext = st.text_area("Masukkan Teks", height=100)
+plaintext = st.text_area("Masukkan Teks 💌", height=100)
 
 c1, c2, c3 = st.columns(3)
 with c1:
-    judul_lagu = st.text_input("Judul Lagu", "Separuh Nafas")
+    judul_lagu = st.text_input("Judul Lagu 🎵", "Separuh Nafas")
 with c2:
-    durasi = st.text_input("Durasi (4.14)", "4.14")
+    durasi = st.text_input("Durasi ⏱️ (4.14)", "4.14")
 with c3:
-    kunci_transposisi = st.text_input("Key Transpose", "3142")
+    kunci_transposisi = st.text_input("Key Transpose 🔑", "3142")
 
 if "hasil" not in st.session_state:
-    st.session_state["hasil"] = "..."
+    st.session_state["hasil"] = "✨ hasil akan muncul di sini ✨"
 
 col1, col2 = st.columns(2)
 with col1:
-    if st.button("Enkripsi", type="primary"):
+    if st.button("💖 Enkripsi"):
         shift = hitung_shift_key(judul_lagu, durasi)
         t1 = enkripsi_substitusi(plaintext, shift)
         t2 = enkripsi_transposisi(t1, kunci_transposisi)
         st.session_state["hasil"] = enkripsi_ekp(t2)
 
 with col2:
-    if st.button("Reset", type="secondary"):
-        st.session_state["hasil"] = "..."
+    if st.button("🧼 Reset"):
+        st.session_state["hasil"] = "✨ hasil akan muncul di sini ✨"
         st.rerun()
 
-st.markdown("<div class='result-label'>Hasil Ciphertext</div>", unsafe_allow_html=True)
+st.markdown("<div class='result-label'>🎀 Hasil Ciphertext 🎀</div>", unsafe_allow_html=True)
 st.markdown(f"<div class='result-box'>{st.session_state['hasil']}</div>", unsafe_allow_html=True)
 
-st.markdown("<div class='credit-text'>create by Aisyah Nur Maya Silviyani</div>", unsafe_allow_html=True)
+st.markdown("<div class='credit-text'>create by Aisyah Nur Maya Silviyani 💕</div>", unsafe_allow_html=True)
