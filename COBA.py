@@ -1,198 +1,162 @@
 import streamlit as st
 import math
 
-# --- 1. CONFIG ---
-st.set_page_config(page_title="Kriptografi", layout="centered")
+# ================== PAGE CONFIG ==================
+st.set_page_config(
+    page_title="Model Caesar Cipher",
+    layout="centered",
+    page_icon="💜"
+)
 
-# --- 2. CSS (WARNA KOTAK & TEKS DIPERBAIKI) ---
+# ================== CSS ==================
 st.markdown("""
-    <style>
-    /* Background Ungu */
-    .stApp {
-        background: linear-gradient(180deg, #4b0082 0%, #2e004f 100%);
-    }
+<style>
+.stApp {
+    background: linear-gradient(180deg, #2b003f 0%, #6a1b9a 55%, #f3e5f5 100%);
+    background-attachment: fixed;
+}
 
-    /* LABEL / TULISAN JUDUL (Supaya kelihatan di background ungu) */
-    h1, h2, h3, p, label, .stMarkdown, span {
-        color: #FFFFFF !important; 
-    }
-    
-    /* JUDUL UTAMA (Ungu Gelap dikit/Hitam sesuai request gambar, tapi dikasih shadow biar baca) */
-    h1 {
-        color: #FFFFFF !important; 
-        text-shadow: 0px 0px 10px rgba(255,255,255,0.3);
-    }
+/* Card utama */
+div[data-testid="block-container"] {
+    background: linear-gradient(145deg, rgba(106,27,154,0.95), rgba(74,20,140,0.95));
+    padding: 3rem;
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+    max-width: 720px;
+    margin-top: 60px;
+}
 
-    /* KOTAK INPUT (TEXTAREA & INPUT BIASA) -> JADI PUTIH, TULISAN HITAM */
-    .stTextInput input, .stTextArea textarea {
-        background-color: #ffffff !important; /* Kotak Putih */
-        color: #000000 !important; /* Tulisan Hitam Pekat */
-        border: 1px solid #ccc !important;
-        border-radius: 8px;
-    }
-    
-    /* TOMBOL (HITAM SESUAI GAMBAR) */
-    div.stButton > button {
-        background-color: #1a1a1a !important; /* Hitam */
-        color: #ffffff !important; /* Tulisan Putih */
-        border: none;
-        height: 45px;
-        font-weight: bold;
-        width: 100%;
-    }
-    div.stButton > button:hover {
-        background-color: #333333 !important; /* Abu gelap pas hover */
-    }
+/* Judul */
+h1 {
+    text-align: center;
+    color: white;
+    font-weight: 700;
+    margin-bottom: 1.8rem;
+}
 
-    /* HASIL BOX (Gelap transparan) */
-    code {
-        background-color: #1a1a1a !important;
-        color: #00ff00 !important; /* Hasil warna hijau terminal */
-        font-family: monospace;
-    }
-    
-    /* Footer & Header hide */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    </style>
+/* Label */
+label {
+    color: #f3e5f5 !important;
+    font-weight: 600;
+}
+
+/* Input */
+textarea, input {
+    border-radius: 10px !important;
+    border: none !important;
+}
+
+/* Tombol */
+div.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #8e24aa, #d500f9);
+    color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    width: 100%;
+    height: 45px;
+    border: none;
+}
+div.stButton > button[kind="secondary"] {
+    background: linear-gradient(135deg, #1565c0, #1e88e5);
+    color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    width: 100%;
+    height: 45px;
+    border: none;
+}
+
+/* Kotak gabungan */
+.unified-box {
+    background: rgba(255,255,255,0.18);
+    border: 2px dashed rgba(255,255,255,0.6);
+    border-radius: 14px;
+    padding: 18px;
+    color: #ffffff;
+    font-family: monospace;
+    line-height: 1.7;
+    margin-top: 20px;
+}
+.unified-box .title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #ffeb3b;
+}
+.unified-box code {
+    color: #ffd54f;
+}
+
+/* Hilangkan menu */
+#MainMenu, footer, header {
+    visibility: hidden;
+}
+</style>
 """, unsafe_allow_html=True)
 
-# --- 3. LOGIKA (TIDAK DIUBAH) ---
-
-def get_shift_value(judul, durasi):
-    judul_clean = ''.join(filter(str.isalpha, judul))
-    len_judul = len(judul_clean)
-    durasi_clean = durasi.replace(".", "").replace(":", "")
-    try:
-        val_durasi = int(durasi_clean)
-    except ValueError:
-        val_durasi = 0
-    return (len_judul + val_durasi) % 26
-
-def substitution_cipher(text, shift, encrypt=True):
-    result = ""
-    if not encrypt: shift = -shift
+# ================== LOGIKA CAESAR ==================
+def caesar_cipher(text, shift):
+    hasil = ""
     for char in text:
         if char.isalpha():
-            start = ord('A') if char.isupper() else ord('a')
-            result += chr((ord(char) - start + shift) % 26 + start)
+            base = ord('A') if char.isupper() else ord('a')
+            hasil += chr((ord(char) - base + shift) % 26 + base)
         else:
-            result += char
-    return result
+            hasil += char
+    return hasil
 
-def transposition_cipher(text, key_str, encrypt=True):
-    if not key_str.isdigit(): return text
-    key_str = key_str[:4]
-    key = [int(k) for k in key_str]
-    num_cols = len(key)
-    if num_cols == 0: return text
-    
-    key_order = sorted(range(len(key)), key=lambda k: key[k])
-    
-    if encrypt:
-        num_rows = math.ceil(len(text) / num_cols)
-        padded_text = text.ljust(num_rows * num_cols, '_')
-        grid = [list(padded_text[r*num_cols : (r+1)*num_cols]) for r in range(num_rows)]
-        cipher = ""
-        for col_idx in key_order:
-            for row in range(num_rows):
-                cipher += grid[row][col_idx]
-        return cipher.replace('_', '')
-    else:
-        num_rows = math.ceil(len(text) / num_cols)
-        grid = [['' for _ in range(num_cols)] for _ in range(num_rows)]
-        idx = 0
-        for k_idx in key_order:
-            for r in range(num_rows):
-                if idx < len(text):
-                    grid[r][k_idx] = text[idx]
-                    idx += 1
-        plain = ""
-        for r in range(num_rows):
-            for c in range(num_cols):
-                plain += grid[r][c]
-        return plain.rstrip('_')
+# ================== UI ==================
+st.markdown("<h1>Model Caesar Cipher</h1>", unsafe_allow_html=True)
 
-def ekp_cipher(text, encrypt=True):
-    ekp_map = {
-        'A': '@1', 'B': '&2*', 'C': '!3%', 'D': '^4$', 'E': '~5=',
-        'F': '+6?', 'G': '<7>', 'H': '#8', 'I': '9!', 'J': '{1}0',
-        'K': '1-1-', 'L': '`12~', 'M': ':1;3', 'N': '1,4<', 'O': 'Ø15',
-        'P': '_1-6', 'Q': '1=7+', 'R': '1®8', 'S': '#1#9', 'T': '2@0@',
-        'U': '2**1', 'V': '%2√2', 'W': '3&2∑', 'X': '2×4!!', 'Y': '^2¥5^', 'Z': '2Ω6$'
-    }
-    
-    if encrypt:
-        hasil = ""
-        for char in text:
-            upper_char = char.upper()
-            if upper_char in ekp_map:
-                hasil += ekp_map[upper_char]
-            else:
-                hasil += char
-        return hasil
-    else:
-        reverse_map = {v: k for k, v in ekp_map.items()}
-        sorted_symbols = sorted(reverse_map.keys(), key=len, reverse=True)
-        hasil = ""
-        i = 0
-        while i < len(text):
-            match = False
-            for sym in sorted_symbols:
-                if text.startswith(sym, i):
-                    hasil += reverse_map[sym]
-                    i += len(sym)
-                    match = True
-                    break
-            if not match:
-                hasil += text[i]
-                i += 1
-        return hasil
+text = st.text_area(
+    "Masukkan Teks (Plaintext / Ciphertext):",
+    height=120
+)
 
-# --- 4. TAMPILAN (LAYOUT) ---
+key = st.text_input(
+    "Kunci Pergeseran (Key):",
+    "12"
+)
 
-st.markdown("<h1 style='text-align: center;'>ALGORITMA KREASI</h1>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
 
-st.write("Masukkan Teks:")
-input_text = st.text_area("", height=100, label_visibility="collapsed")
+if "hasil" not in st.session_state:
+    st.session_state.hasil = ""
 
-st.write("Konfigurasi Kunci:")
-c1, c2, c3 = st.columns(3)
-with c1:
-    judul_lagu = st.text_input("Judul Lagu", placeholder="Judul")
-with c2:
-    durasi_lagu = st.text_input("Durasi", placeholder="Cth: 3.12")
-with c3:
-    key_trans = st.text_input("Key Transposisi", placeholder="1725")
+with col1:
+    if st.button("Enkripsi", type="primary"):
+        if text and key.isdigit():
+            st.session_state.hasil = caesar_cipher(text, int(key))
+        else:
+            st.error("Masukkan teks dan key angka")
 
-st.write("") # Spasi
+with col2:
+    if st.button("Dekripsi", type="secondary"):
+        if text and key.isdigit():
+            st.session_state.hasil = caesar_cipher(text, -int(key))
+        else:
+            st.error("Masukkan teks dan key angka")
 
-# Tombol
-col_l, col_btn1, col_btn2, col_r = st.columns([0.1, 1, 1, 0.1])
-with col_btn1:
-    enc_btn = st.button("ENKRIPSI", use_container_width=True)
-with col_btn2:
-    dec_btn = st.button("DEKRIPSI / RESET", use_container_width=True)
+# ================== HASIL + FUNGSI (GABUNG) ==================
+st.markdown(f"""
+<div class="unified-box">
+    <div class="title">Hasil Akhir</div>
+    <code>{st.session_state.hasil}</code>
 
-# Proses
-result = ""
-if enc_btn and input_text and judul_lagu and durasi_lagu and key_trans:
-    s1 = substitution_cipher(input_text, get_shift_value(judul_lagu, durasi_lagu), True)
-    s2 = transposition_cipher(s1, key_trans, True)
-    result = ekp_cipher(s2, True)
-    st.success("Enkripsi Berhasil")
+    <br><br>
 
-elif dec_btn and input_text and judul_lagu and durasi_lagu and key_trans:
-    s1 = ekp_cipher(input_text, False)
-    s2 = transposition_cipher(s1, key_trans, False)
-    result = substitution_cipher(s2, get_shift_value(judul_lagu, durasi_lagu), False)
-    # Hack alert box color manually via markdown if needed, but standard st.info is mostly ok
-    st.info("Dekripsi Berhasil")
+    <div class="title">Tampilan Fungsi</div>
 
-if result:
-    st.write("Hasil:")
-    st.code(result)
-    
-    # Credit
-    st.markdown("<div style='text-align: center; color: #888; font-size: 12px; margin-top: 20px;'>create by Aisyah Nur Maya Silviyani</div>", unsafe_allow_html=True)
+    <b>Input Teks:</b><br>
+    <code>{text}</code><br><br>
+
+    <b>Kunci (Shift):</b><br>
+    <code>{key}</code><br><br>
+
+    <b>Rumus Caesar Cipher:</b><br>
+    <code>(x + key) mod 26</code><br><br>
+
+    <b>Fungsi yang Digunakan:</b><br>
+    <code>caesar_cipher(teks, key)</code>
+</div>
+""", unsafe_allow_html=True)
