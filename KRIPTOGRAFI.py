@@ -3,8 +3,7 @@ import math
 
 # --- 1. Konfigurasi Halaman ---
 st.set_page_config(
-    page_title="Kriptografi EKP",
-    page_icon="🔒",
+    page_title="Algoritma Kripto",
     layout="centered"
 )
 
@@ -44,8 +43,8 @@ st.markdown("""
         background: linear-gradient(90deg, #aa076b 0%, #61045f 100%); 
         color: white;
         border: none;
-        border-radius: 8px;
-        height: 45px;
+        border-radius: 10px;
+        height: 50px;
         font-weight: bold;
         width: 100%;
         transition: 0.3s;
@@ -63,7 +62,7 @@ st.markdown("""
         background-color: rgba(255, 255, 255, 0.15);
         border: 2px dashed rgba(255, 255, 255, 0.5);
         border-radius: 10px;
-        padding: 15px;
+        padding: 50px;
         color: white;
         margin-top: 10px;
         font-family: monospace;
