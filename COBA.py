@@ -14,7 +14,7 @@ st.markdown("""
 
     /* LABEL / TULISAN JUDUL (Supaya kelihatan di background ungu) */
     h1, h2, h3, p, label, .stMarkdown, span {
-        color: #e0e0e0 !important; /* Putih agak abu dikit biar gak sakit mata */
+        color: #FFFFFF !important; 
     }
     
     /* JUDUL UTAMA (Ungu Gelap dikit/Hitam sesuai request gambar, tapi dikasih shadow biar baca) */
@@ -120,8 +120,7 @@ def ekp_cipher(text, encrypt=True):
         'F': '+6?', 'G': '<7>', 'H': '#8', 'I': '9!', 'J': '{1}0',
         'K': '1-1-', 'L': '`12~', 'M': ':1;3', 'N': '1,4<', 'O': 'Ø15',
         'P': '_1-6', 'Q': '1=7+', 'R': '1®8', 'S': '#1#9', 'T': '2@0@',
-        'U': '2**1', 'V': '%2√2', 'W': '3&2∑', 'X': '2×4!!', 'Y': '^2¥5^', 'Z': '2Ω6$',
-        ' ': '_', '_': '~'
+        'U': '2**1', 'V': '%2√2', 'W': '3&2∑', 'X': '2×4!!', 'Y': '^2¥5^', 'Z': '2Ω6$'
     }
     
     if encrypt:
