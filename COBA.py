@@ -19,7 +19,7 @@ st.markdown("""
     
     /* JUDUL UTAMA (Ungu Gelap dikit/Hitam sesuai request gambar, tapi dikasih shadow biar baca) */
     h1 {
-        color: #1a1a1a !important; 
+        color: #FFFFFF !important; 
         text-shadow: 0px 0px 10px rgba(255,255,255,0.3);
     }
 
