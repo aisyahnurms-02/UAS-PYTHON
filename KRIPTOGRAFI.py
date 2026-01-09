@@ -1,113 +1,120 @@
 import streamlit as st
 import math
 
-# --- KONFIGURASI HALAMAN & CSS (TEMA UNGU) ---
-st.set_page_config(page_title="Crypto Aisyah", layout="wide", page_icon="💜")
+# --- KONFIGURASI HALAMAN ---
+st.set_page_config(
+    page_title="Crypto Aisyah - Purple Edition", 
+    layout="centered", 
+    page_icon="💜"
+)
 
-# Custom CSS untuk Tema Ungu & Putih
+# --- CUSTOM CSS (TAMPILAN SERBA UNGU) ---
 st.markdown("""
     <style>
-    /* Mengubah warna background utama menjadi putih bersih */
+    /* 1. Background Halaman: Gradasi Ungu Gelap ke Putih (Sesuai gambar) */
     .stApp {
-        background-color: #FFFFFF;
-        color: #333333;
+        background: rgb(68,10,103);
+        background: linear-gradient(180deg, rgba(68,10,103,1) 0%, rgba(180,135,255,1) 80%, rgba(255,255,255,1) 100%);
+        background-attachment: fixed;
     }
-    
-    /* Mengubah warna Sidebar menjadi Ungu Muda (Lavender) */
-    [data-testid="stSidebar"] {
-        background-color: #F3E5F5;
-        border-right: 2px solid #E1BEE7;
+
+    /* 2. Kartu Utama: Ungu Gradasi (Sesuai gambar) */
+    div[data-testid="block-container"] {
+        background: linear-gradient(135deg, #7B1FA2 0%, #4A148C 100%);
+        padding: 3rem;
+        border-radius: 15px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        margin-top: 50px;
+        max-width: 700px;
     }
-    
-    /* Mengubah warna Judul dan Header menjadi Ungu Tua */
-    h1, h2, h3, h4, h5, h6 {
-        color: #4A148C !important;
+
+    /* 3. Semua Teks Menjadi PUTIH (Agar terbaca di background ungu) */
+    h1, h2, h3, p, div, label, span {
+        color: #FFFFFF !important;
         font-family: 'Segoe UI', sans-serif;
     }
-    
-    /* Styling Tombol (Button) menjadi Ungu */
-    div.stButton > button {
-        background-color: #7B1FA2;
-        color: white;
-        border-radius: 10px;
+
+    /* 4. Input Fields: Putih Bersih dengan Teks Hitam */
+    .stTextInput input, .stTextArea textarea {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        border-radius: 8px;
         border: none;
-        padding: 10px 24px;
+    }
+    /* Warna Label Input */
+    .stTextInput > label, .stTextArea > label {
         font-weight: bold;
-        transition: 0.3s;
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+
+    /* 5. Tombol */
+    /* Tombol Enkripsi (Kiri): Ungu Neon/Magenta */
+    div.stButton > button[kind="primary"] {
+        background-color: #D500F9 !important; /* Magenta terang */
+        color: white !important;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
         width: 100%;
-    }
-    div.stButton > button:hover {
-        background-color: #4A148C; /* Ungu lebih gelap saat hover */
-        border: 2px solid #BA68C8;
-        color: #fff;
+        padding: 0.6rem;
+        font-size: 16px;
     }
     
-    /* Styling Input Field agar border ungu */
-    div[data-baseweb="input"] {
-        border: 1px solid #CE93D8;
+    /* Tombol Dekripsi (Kanan): Biru Tua (Navy) */
+    div.stButton > button[kind="secondary"] {
+        background-color: #0D47A1 !important; /* Biru Tua */
+        color: white !important;
+        border: none;
         border-radius: 8px;
+        font-weight: bold;
+        width: 100%;
+        padding: 0.6rem;
+        font-size: 16px;
     }
-    
-    /* Styling Text Area */
-    div[data-baseweb="textarea"] {
-        border: 1px solid #CE93D8;
-        border-radius: 8px;
-    }
-    
-    /* Custom Box untuk Hasil */
-    .custom-box {
-        background-color: #F8F0FC; /* Ungu sangat muda */
-        padding: 20px;
+
+    /* 6. Kotak Hasil: Transparan dengan Border Putus-putus (Sesuai gambar) */
+    .result-box {
+        background-color: rgba(255, 255, 255, 0.2); /* Transparan putih */
+        border: 2px dashed rgba(255, 255, 255, 0.6);
         border-radius: 10px;
-        border-left: 5px solid #8E24AA;
-        margin-bottom: 20px;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+        padding: 15px;
+        color: #FFFFFF;
+        font-family: monospace;
+        font-weight: bold;
+        font-size: 1.2rem;
+        min-height: 60px;
+        margin-top: 5px;
     }
     
     /* Footer Style */
-    .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: #4A148C;
-        color: white;
+    .credit-text {
         text-align: center;
-        padding: 10px;
-        font-weight: bold;
-        letter-spacing: 1px;
-        z-index: 999;
+        color: rgba(255,255,255,0.7) !important;
+        font-size: 12px;
+        margin-top: 30px;
+        font-style: italic;
     }
+
+    /* Hide default elements */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
     
-    /* Spacer untuk konten agar tidak tertutup footer */
-    .spacer {
-        height: 50px;
-    }
     </style>
 """, unsafe_allow_html=True)
 
-# --- LOGIKA KRIPTOGRAFI (SAMA SEPERTI SEBELUMNYA) ---
+# --- LOGIKA PROGRAM (TETAP SAMA) ---
 
 def hitung_shift_key(judul_lagu, durasi_menit):
     jumlah_huruf = len(judul_lagu.replace(" ", ""))
     durasi_bersih = durasi_menit.replace(".", "")
-    
     if not durasi_bersih.isdigit():
-        return 0, "⚠️ Error: Durasi harus angka."
-        
+        return 0
     nilai_durasi = int(durasi_bersih)
     total = jumlah_huruf + nilai_durasi
     shift = total % 26
-    
-    # Penjelasan detail untuk UI
-    penjelasan = f"""
-    **Rumus:** (Huruf Lagu + Menit) mod 26
-    <br>• Huruf '{judul_lagu}': {jumlah_huruf}
-    <br>• Menit '{durasi_menit}': {nilai_durasi}
-    <br>• Total: {total}
-    <br>• **Shift Key:** {total} mod 26 = **{shift}**
-    """
-    return shift, penjelasan
+    return shift
 
 def enkripsi_substitusi(text, shift):
     result = ""
@@ -123,26 +130,22 @@ def enkripsi_substitusi(text, shift):
 def enkripsi_transposisi(text, key):
     if not key.isdigit():
         return text
-    
     msg_len = float(len(text))
-    msg_lst = list(text)
     key_lst = list(key)
     num_cols = len(key)
     num_rows = int(math.ceil(msg_len / num_cols))
+    msg_lst = list(text)
     num_empty = (num_rows * num_cols) - len(msg_lst)
     msg_lst.extend(['_'] * num_empty)
-    
     matrix = [msg_lst[i * num_cols: (i + 1) * num_cols] for i in range(num_rows)]
     ciphertext = ""
     key_with_index = sorted([(k, i) for i, k in enumerate(key_lst)])
-    
     for _, k_index in key_with_index:
         for row in matrix:
             ciphertext += row[k_index]
     return ciphertext
 
 def enkripsi_ekp(text):
-    # Mapping Simbol Unik (Nuansa Alien/Kriptik)
     ekp_map = {
         'A': '@1', 'B': '&2*', 'C': '!3%', 'D': '^4$', 'E': '~5=',
         'F': '+6?', 'G': '<7>', 'H': '#8', 'I': '9!', 'J': '{1}0',
@@ -160,100 +163,63 @@ def enkripsi_ekp(text):
             hasil += char
     return hasil
 
-# --- UI UTAMA ---
+# --- UI VISUAL ---
 
-st.title("KRIPTOGRAFI")
-st.markdown("---")
+# Judul
+st.markdown("<h1 style='text-align: center; margin-bottom: 30px;'>Kriptografi Aisyah</h1>", unsafe_allow_html=True)
 
-# Layout Kolom untuk Input
-col_input1, col_input2 = st.columns([1, 2])
+# Input Text
+plaintext = st.text_area("Masukkan Teks (Plaintext/Ciphertext):", height=100)
 
-with col_input1:
-    st.markdown("### Konfigurasi Kunci")
-    with st.container():
-        # Input Judul Lagu
-        judul_lagu = st.text_input("🎵 Judul Lagu", "Separuh Nafas")
-        # Input Durasi
-        durasi = st.text_input("⏱️ Durasi (misal 4.14)", "4.14")
-        # Input Kunci Transposisi
-        kunci_transposisi = st.text_input("🔢 Kunci Transposisi (Maks 4 digit)", "3142", max_chars=4)
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("<label>Konfigurasi Kunci:</label>", unsafe_allow_html=True)
 
-with col_input2:
-    st.markdown("### Pesan Rahasia")
-    plaintext = st.text_area("Masukkan Plaintext di sini:", "AISYAH NUR MAYA", height=200)
+# Input Kunci (Disusun Berjajar 3 agar rapi seperti kolom input tunggal)
+c1, c2, c3 = st.columns(3)
+with c1:
+    judul_lagu = st.text_input("Judul Lagu", "Separuh Nafas")
+with c2:
+    durasi = st.text_input("Durasi (Ex: 4.14)", "4.14")
+with c3:
+    kunci_transposisi = st.text_input("Key Transpose", "3142")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Tombol Proses (Full Width)
-if st.button(" PROSES ENKRIPSI SEKARANG "):
-    if not plaintext or not judul_lagu or not durasi or not kunci_transposisi:
-        st.error("⚠️ Mohon lengkapi semua kolom input!")
-    else:
-        # --- PROSES ---
-        shift_val, info_rumus = hitung_shift_key(judul_lagu, durasi)
-        
-        # 1. Substitusi
-        cipher_1 = enkripsi_substitusi(plaintext, shift_val)
-        
-        # 2. Transposisi
-        cipher_2 = enkripsi_transposisi(cipher_1, kunci_transposisi)
-        
-        # 3. EKP
-        cipher_final = enkripsi_ekp(cipher_2)
-        
-        st.markdown("---")
-        st.subheader("Hasil Enkripsi Bertahap")
-        
-        col_res1, col_res2, col_res3 = st.columns(3)
-        
-        with col_res1:
-            st.markdown(f"""
-            <div class="custom-box">
-                <h4 style="color:#4A148C;">1. Metode Substitusi</h4>
-                <div style="font-size:0.9em; color:#555;">{info_rumus}</div>
-                <hr style="border-top: 1px dashed #BA68C8;">
-                <b>Hasil:</b><br>
-                <code style="color:#D500F9;">{cipher_1}</code>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        with col_res2:
-            st.markdown(f"""
-            <div class="custom-box">
-                <h4 style="color:#4A148C;">2. Metode Transposisi</h4>
-                <div style="font-size:0.9em; color:#555;">
-                Menggunakan kunci kolom: <b>{kunci_transposisi}</b><br>
-                Padding karakter: '_'
-                </div>
-                <hr style="border-top: 1px dashed #BA68C8;">
-                <b>Hasil:</b><br>
-                <code style="color:#D500F9;">{cipher_2}</code>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        with col_res3:
-            st.markdown(f"""
-            <div class="custom-box" style="background-color: #E1BEE7; border-left: 5px solid #4A148C;">
-                <h4 style="color:#4A148C;">3. Metode EKP (Final)</h4>
-                <div style="font-size:0.9em; color:#555;">
-                Ekspansi ke simbol Polialfanumerik.
-                </div>
-                <hr style="border-top: 1px dashed #BA68C8;">
-                <b>OUTPUT AKHIR:</b><br>
-                <code style="color:#000; font-weight:bold; font-size:1.2em;">{cipher_final}</code>
-            </div>
-            """, unsafe_allow_html=True)
+# Tombol Action (Warna disesuaikan CSS)
+col_btn1, col_btn2 = st.columns(2)
 
-        # Area Copy Hasil Akhir
-        st.markdown("### 📋 Salin Hasil Akhir")
-        st.text_area("Ciphertext:", cipher_final, height=70)
+# Session State
+if 'hasil_ungu' not in st.session_state:
+    st.session_state['hasil_ungu'] = ""
 
-# Spacer agar konten tidak tertutup footer
-st.markdown('<div class="spacer"></div>', unsafe_allow_html=True)
+with col_btn1:
+    # Tombol Enkripsi (Magenta)
+    if st.button("Enkripsi", type="primary"):
+        if plaintext and judul_lagu and durasi and kunci_transposisi:
+            shift = hitung_shift_key(judul_lagu, durasi)
+            t1 = enkripsi_substitusi(plaintext, shift)
+            t2 = enkripsi_transposisi(t1, kunci_transposisi)
+            st.session_state['hasil_ungu'] = enkripsi_ekp(t2)
+        else:
+            st.warning("Data belum lengkap!")
 
-# --- FOOTER ---
+with col_btn2:
+    # Tombol Dekripsi/Reset (Biru Tua)
+    if st.button("Dekripsi / Reset", type="secondary"):
+        st.session_state['hasil_ungu'] = ""
+        st.rerun()
+
+# Output Box
+st.markdown("<label style='margin-top: 20px; display:block;'>Hasil:</label>", unsafe_allow_html=True)
+st.markdown(f"""
+    <div class="result-box">
+        {st.session_state['hasil_ungu']}
+    </div>
+""", unsafe_allow_html=True)
+
+# Footer
 st.markdown("""
-    <div class="footer">
+    <div class="credit-text">
         create by Aisyah Nur Maya Silviyani
     </div>
 """, unsafe_allow_html=True)
