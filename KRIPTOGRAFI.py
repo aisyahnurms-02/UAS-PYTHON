@@ -138,7 +138,7 @@ result = ""
 
 if enc_btn or dec_btn:
     if not validasi_durasi(durasi_lagu):
-        st.error("Durasi harus berupa angka dan boleh menggunakan titik.")
+        st.error("Durasi harus berupa angka beserta titiknya.")
     elif input_text and judul_lagu and durasi_lagu and key_trans:
         if enc_btn:
             result = ekp_cipher(
