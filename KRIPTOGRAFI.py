@@ -1,82 +1,86 @@
 import streamlit as st
 import math
 
-# --- 1. Konfigurasi Halaman ---
+# --- 1. KONFIGURASI HALAMAN ---
 st.set_page_config(
-    page_title="Algoritma Kripto",
-    layout="centered"
+    page_title="Kriptografi",
+    layout="centered" # Penting agar posisi default di tengah
 )
 
-# --- 2. Custom CSS (Desain Mirip Screenshot Baru) ---
+# --- 2. CSS "CARD UI" (Kotak Besar di Tengah) ---
 st.markdown("""
     <style>
-    /* Background Utama: Gradient Ungu */
+    /* 1. Background Halaman Utama (Luar Kotak) - Tetap Ungu */
     .stApp {
-        background: linear-gradient(135deg, #4b0082 0%, #8e44ad 100%);
+        background: linear-gradient(180deg, #6a11cb 0%, #2575fc 100%);
         background-attachment: fixed;
     }
 
-    div[data-testid="stVerticalBlock"] > div:has(div.element-container) {
-        background: linear-gradient(180deg, rgba(75, 0, 130, 0.6) 0%, rgba(138, 43, 226, 0.4) 100%);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    /* 2. Mengatur Container Utama menjadi "KOTAK BESAR" (Card) */
+    div.block-container {
+        background-color: rgba(255, 255, 255, 0.95); /* Putih sedikit transparan */
+        padding: 3rem;       /* Jarak dalam kotak */
+        border-radius: 25px; /* Sudut membulat */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Bayangan hitam di belakang kotak */
+        max-width: 700px;    /* Lebar maksimal kotak agar terlihat rapi */
+        margin-top: 2rem;
+    }
+
+    /* 3. Memastikan SEMUA TEKS di dalam kotak berwarna HITAM/GELAP */
+    h1, h2, h3, h4, h5, p, label, div, span, .stMarkdown {
+        color: #333333 !important;
     }
     
-    .stTextInput label, .stTextArea label, .stNumberInput label, p, h1, h2, h3 {
-        color: #ffffff !important;
+    /* Judul Utama */
+    h1 {
+        text-align: center;
+        font-weight: 800;
+        color: #4b0082 !important; /* Ungu gelap */
+        margin-bottom: 30px;
+        text-shadow: none; /* Hapus shadow jika ada sisa */
     }
 
-    /* Styling Input Field (Kotak Putih, Teks Hitam) */
+    /* 4. Styling Input Fields (Agar border jelas) */
     .stTextInput input, .stTextArea textarea {
-        background-color: #ffffff !important;
+        background-color: #f8f9fa !important;
         color: #000000 !important;
-        border-radius: 5px;
-    }
-
-    /* Tombol Enkripsi (Ungu Terang/Magenta) */
-    div.stButton > button:first-child {
-        background: linear-gradient(90deg, #aa076b 0%, #61045f 100%); 
-        color: white;
-        border: none;
+        border: 2px solid #d1d1d1 !important;
         border-radius: 10px;
+    }
+    .stTextInput input:focus, .stTextArea textarea:focus {
+        border-color: #4b0082 !important; /* Border ungu saat diklik */
+    }
+    
+    /* 5. Styling Tombol */
+    /* Tombol Enkripsi (Kiri) */
+    div[data-testid="column"]:nth-of-type(2) button {
+        background-color: #aa00ff !important; /* Ungu Neon */
+        color: white !important;
+        border: none;
         height: 50px;
         font-weight: bold;
-        width: 100%;
-        transition: 0.3s;
-    }
-    div.stButton > button:first-child:hover {
-        transform: scale(1.02);
-        box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
-    }
-
-    /* Tombol Dekripsi (Biru Tua) - Kita pakai CSS hack urutan tombol */
-    /* Karena streamlit sulit menarget tombol spesifik, kita akali di python layout */
-
-    /* Kotak Hasil (Dashed Border) */
-    .result-box {
-        background-color: rgba(255, 255, 255, 0.15);
-        border: 2px dashed rgba(255, 255, 255, 0.5);
-        border-radius: 10px;
-        padding: 50px;
-        color: white;
-        margin-top: 10px;
-        font-family: monospace;
-        font-size: 1.1em;
-    }
-
-    /* Footer */
-    .footer-text {
-        text-align: center;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.8rem;
-        margin-top: 20px;
-        font-style: italic;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
     
-    /* Hide Default Elements */
+    /* Tombol Dekripsi (Kanan) */
+    div[data-testid="column"]:nth-of-type(3) button {
+        background-color: #004ba0 !important; /* Biru Gelap */
+        color: white !important;
+        border: none;
+        height: 50px;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    /* 6. Styling Kotak Hasil */
+    code {
+        color: #d63384 !important; /* Warna teks hasil pink/ungu */
+        background-color: #f1f1f1 !important; /* Background hasil abu terang */
+        font-weight: bold;
+        border: 1px dashed #4b0082;
+    }
+    
+    /* Sembunyikan elemen bawaan */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -84,25 +88,23 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. Fungsi Logika Kriptografi ---
+# --- 3. LOGIKA KRIPTOGRAFI ---
 
-def get_substitution_shift(judul_lagu, durasi_str):
-    if not judul_lagu or not durasi_str:
-        return 0
-    judul_clean = judul_lagu.replace(" ", "")
+def get_shift_value(judul, durasi):
+    judul_clean = ''.join(filter(str.isalpha, judul))
     len_judul = len(judul_clean)
-    durasi_clean = durasi_str.replace(".", "").replace(":", "")
+    durasi_clean = durasi.replace(".", "").replace(":", "")
     try:
-        durasi_val = int(durasi_clean)
+        val_durasi = int(durasi_clean)
     except ValueError:
-        durasi_val = 0
-    total_val = len_judul + durasi_val
-    shift = total_val % 26
+        val_durasi = 0
+    total = len_judul + val_durasi
+    shift = total % 26
     return shift
 
-def substitution_cipher(text, shift, decrypt=False):
+def substitution_cipher(text, shift, encrypt=True):
     result = ""
-    if decrypt: shift = -shift
+    if not encrypt: shift = -shift
     for char in text:
         if char.isalpha():
             start = ord('A') if char.isupper() else ord('a')
@@ -111,160 +113,139 @@ def substitution_cipher(text, shift, decrypt=False):
             result += char
     return result
 
-def transposition_cipher(text, key_str, decrypt=False):
+def transposition_cipher(text, key_str, encrypt=True):
     if not key_str.isdigit(): return text
+    key_str = key_str[:4]
     key = [int(k) for k in key_str]
     num_cols = len(key)
     if num_cols == 0: return text
+    key_order = sorted(range(len(key)), key=lambda k: key[k])
     
-    if not decrypt:
-        # Enkripsi Transposisi
+    if encrypt:
         num_rows = math.ceil(len(text) / num_cols)
         padded_text = text.ljust(num_rows * num_cols, '_')
-        grid = [['' for _ in range(num_cols)] for _ in range(num_rows)]
-        idx = 0
+        grid = []
         for r in range(num_rows):
-            for c in range(num_cols):
-                grid[r][c] = padded_text[idx]
-                idx += 1
-        
-        # Urutkan berdasarkan index key (Sederhana: baca kolom 0, 1, 2 sesuai urutan key user)
-        # Note: Implementasi Columnar Cipher yang "benar" biasanya mengurutkan key dulu.
-        # Disini kita ikuti alur simpel: Key "3142" -> Baca kolom ke-3, lalu ke-1, dst.
-        cipher_text = ""
-        # Karena user minta "kunci transposisi", kita asumsikan urutan pembacaan kolom
-        # Mapping key digit ke index kolom (0-based)
-        # Misal key 3142 -> kita anggap maksudnya urutan prioritas, tapi agar simpel dan bisa didekripsi:
-        # Kita pakai standard columnar: Sort key, read column corresponding to sorted key.
-        
-        # Untuk simplifikasi sesuai request level mahasiswa:
-        # Kita pakai transposisi matriks sederhana saja (Read Column by Column)
-        result = ""
-        for c in range(num_cols):
-            for r in range(num_rows):
-                result += grid[r][c]
-        return result.replace('_', '') # Hapus padding
-        
+            grid.append(list(padded_text[r*num_cols : (r+1)*num_cols]))
+        cipher = ""
+        for col_idx in key_order:
+            for row in range(num_rows):
+                cipher += grid[row][col_idx]
+        return cipher.replace('_', '')
     else:
-        # Dekripsi Transposisi (Logic kebalikan sederhana)
-        # Hitung row dan col
         num_rows = math.ceil(len(text) / num_cols)
-        num_full_cells = len(text)
-        
-        # Reconstruct grid by filling columns
         grid = [['' for _ in range(num_cols)] for _ in range(num_rows)]
         idx = 0
-        for c in range(num_cols):
+        for k_idx in key_order:
             for r in range(num_rows):
                 if idx < len(text):
-                    grid[r][c] = text[idx]
+                    grid[r][k_idx] = text[idx]
                     idx += 1
-        
-        # Read rows
-        result = ""
+        plain = ""
         for r in range(num_rows):
             for c in range(num_cols):
-                result += grid[r][c]
-        return result
+                plain += grid[r][c]
+        return plain.rstrip('_')
 
-def ekp_cipher(text, decrypt=False):
-    # Mapping Karakter ke Simbol (EKP)
-    # Ini mapping contoh, pastikan tabel mapping sama saat dekripsi
-    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    # Simbol diperluas (Expansion)
-    symbols = [
-        'α', 'β', '©', 'δ', '€', 'ƒ', '6', '#', '!', '¿', 'κ', '£', 'μ', 'η', 'ø', '¶', 'Ω', '®', '$', '†', 'µ', '√', 'ω', '×', '¥', 'ž',
-        'Α', 'Β', 'Ç', 'Δ', '£', 'F', 'G', 'H', '1', 'J', 'K', 'L', 'M', 'N', '0', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-        '⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'
-    ]
+def ekp_cipher(text, encrypt=True):
+    ekp_map = {
+        'A': '@1', 'B': '&2*', 'C': '!3%', 'D': '^4$', 'E': '~5=',
+        'F': '+6?', 'G': '<7>', 'H': '#8', 'I': '9!', 'J': '{1}0',
+        'K': '1-1-', 'L': '`12~', 'M': ':1;3', 'N': '1,4<', 'O': 'Ø15',
+        'P': '_1-6', 'Q': '1=7+', 'R': '1®8', 'S': '#1#9', 'T': '2@0@',
+        'U': '2**1', 'V': '%2√2', 'W': '3&2∑', 'X': '2×4!!', 'Y': '^2¥5^', 'Z': '2Ω6$',
+        ' ': '_', '_': '~'
+    }
     
-    # Buat dictionary
-    encode_map = {c: s for c, s in zip(chars, symbols)}
-    decode_map = {s: c for c, s in zip(chars, symbols)}
-    
-    result = ""
-    for char in text:
-        if not decrypt:
-            result += encode_map.get(char, char)
-        else:
-            result += decode_map.get(char, char)
-    return result
+    if encrypt:
+        hasil = ""
+        for char in text:
+            upper_char = char.upper()
+            if upper_char in ekp_map:
+                hasil += ekp_map[upper_char]
+            else:
+                hasil += char
+        return hasil
+    else:
+        reverse_map = {v: k for k, v in ekp_map.items()}
+        sorted_symbols = sorted(reverse_map.keys(), key=len, reverse=True)
+        hasil = ""
+        i = 0
+        while i < len(text):
+            match = False
+            for sym in sorted_symbols:
+                if text.startswith(sym, i):
+                    hasil += reverse_map[sym]
+                    i += len(sym)
+                    match = True
+                    break
+            if not match:
+                hasil += text[i]
+                i += 1
+        return hasil
 
-# --- 4. Tampilan UI ---
+# --- 4. TAMPILAN UTAMA (UI) ---
 
-st.markdown("<h1 style='text-align: center; color: white; margin-bottom: 30px;'>Kriptografi EKP</h1>", unsafe_allow_html=True)
+st.title("ALGORITMA KREASI")
 
-# Input Text
-plaintext = st.text_area("Masukkan Teks (Plaintext/Ciphertext):", height=100)
+# Input Utama
+st.markdown("### Masukkan Teks (Plaintext/Ciphertext):")
+input_text = st.text_area("", height=100, placeholder="Ketik amikom...", label_visibility="collapsed")
 
-# Konfigurasi Kunci
-st.markdown("### Konfigurasi Kunci")
-col_k1, col_k2, col_k3 = st.columns(3)
+# Konfigurasi
+st.markdown("### Konfigurasi Kunci:")
+c1, c2, c3 = st.columns(3)
+with c1:
+    judul_lagu = st.text_input("Judul Lagu", placeholder="Separuh Nafas")
+with c2:
+    durasi_lagu = st.text_input("Durasi", placeholder="4.14")
+with c3:
+    key_trans = st.text_input("Key Transposisi", placeholder="1234", max_chars=4)
 
-with col_k1:
-    judul_lagu = st.text_input("Judul Lagu", placeholder="Cth: Separuh Nafas")
-with col_k2:
-    durasi = st.text_input("Durasi", placeholder="Cth: 4.14")
-with col_k3:
-    key_trans = st.text_input("Key Transposisi", placeholder="Cth: 3142")
-
-# Tombol Action
 st.write("") # Spacer
-col_btn1, col_btn2 = st.columns(2)
 
-action = None
-with col_btn1:
-    # Tombol Enkripsi (Ungu)
-    if st.button(" Enkripsi 🔒"):
-        action = "encrypt"
+# Tombol
+col_l, btn_enc, btn_dec, col_r = st.columns([0.1, 2, 2, 0.1])
+with btn_enc:
+    do_encrypt = st.button("Enkripsi", use_container_width=True)
+with btn_dec:
+    do_decrypt = st.button("Dekripsi", use_container_width=True)
 
-with col_btn2:
-    # Tombol Dekripsi (Biru - Styling manual lewat st.markdown button hack agak rumit, 
-    # jadi kita biarkan default streamlit secondary button tapi di CSS kita target tombol ke-2 jika bisa,
-    # atau biarkan abu-abu gelap agar kontras).
-    # Namun, agar sesuai request "Biru", kita gunakan button type "primary" untuk enkripsi, 
-    # dan kita inject CSS khusus untuk tombol di kolom 2 jika memungkinkan.
-    # Disini kita pakai tombol biasa, nanti warnanya ikut CSS global atau default.
-    if st.button("Dekripsi 🔓"):
-        action = "decrypt"
+# Logika
+final_res = ""
+status_msg = ""
 
-# --- 5. Proses & Hasil ---
-if action and plaintext:
-    shift = get_substitution_shift(judul_lagu, durasi)
+if do_encrypt and input_text and judul_lagu and durasi_lagu and key_trans:
+    s1 = substitution_cipher(input_text, get_shift_value(judul_lagu, durasi_lagu), True)
+    s2 = transposition_cipher(s1, key_trans, True)
+    final_res = ekp_cipher(s2, True)
+    status_msg = "Enkripsi Berhasil"
+
+elif do_decrypt and input_text and judul_lagu and durasi_lagu and key_trans:
+    s1 = ekp_cipher(input_text, False)
+    s2 = transposition_cipher(s1, key_trans, False)
+    final_res = substitution_cipher(s2, get_shift_value(judul_lagu, durasi_lagu), False)
+    status_msg = "Dekripsi Berhasil"
+
+# Hasil
+if final_res:
+    if status_msg == "Enkripsi Berhasil":
+        st.success(status_msg)
+    else:
+        st.info(status_msg)
+        
+    st.markdown("### Hasil:")
+    st.code(final_res)
     
-    if action == "encrypt":
-        # 1. Substitusi
-        step1 = substitution_cipher(plaintext, shift, decrypt=False)
-        # 2. Transposisi
-        step2 = transposition_cipher(step1, key_trans, decrypt=False)
-        # 3. Ekspansi (EKP)
-        final_result = ekp_cipher(step2, decrypt=False)
-        label = "Hasil Enkripsi:"
-    
-    else: # Decrypt
-        # Urutan Dekripsi dibalik: EKP -> Transposisi -> Substitusi
-        # 1. Reverse EKP
-        step1 = ekp_cipher(plaintext, decrypt=True)
-        # 2. Reverse Transposisi
-        step2 = transposition_cipher(step1, key_trans, decrypt=True)
-        # 3. Reverse Substitusi
-        final_result = substitution_cipher(step2, shift, decrypt=True)
-        label = "Hasil Dekripsi:"
-
-    # Tampilkan Hasil dalam Kotak Dashed
-    st.markdown(f"**{label}**")
-    st.markdown(f"""
-        <div class="result-box">
-            {final_result}
-        </div>
-    """, unsafe_allow_html=True)
-    
-    # Footer Nama (Muncul setelah hasil)
     st.markdown("""
-        <div class="footer-text">
+        <div style='text-align: center; margin-top: 20px; font-size: 12px; color: #888;'>
             create by Aisyah Nur Maya Silviyani
         </div>
     """, unsafe_allow_html=True)
 
-elif action and not plaintext:
-    st.warning("Mohon masukkan teks terlebih dahulu.")
+elif not final_res:
+    st.markdown("""
+        <div style='text-align: center; margin-top: 40px; font-size: 12px; color: #888;'>
+            create by Aisyah Nur Maya Silviyani
+        </div>
+    """, unsafe_allow_html=True)
