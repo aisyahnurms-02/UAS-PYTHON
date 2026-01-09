@@ -16,7 +16,6 @@ st.markdown("""
         background-attachment: fixed;
     }
 
-    /* Container Utama (Card): Efek Glassmorphism (Transparan Ungu Gelap) */
     div[data-testid="stVerticalBlock"] > div:has(div.element-container) {
         background: linear-gradient(180deg, rgba(75, 0, 130, 0.6) 0%, rgba(138, 43, 226, 0.4) 100%);
         backdrop-filter: blur(10px);
@@ -25,8 +24,7 @@ st.markdown("""
         border-radius: 15px;
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
     }
-
-    /* Mengubah warna semua teks label menjadi Putih */
+    
     .stTextInput label, .stTextArea label, .stNumberInput label, p, h1, h2, h3 {
         color: #ffffff !important;
     }
@@ -200,7 +198,7 @@ st.markdown("<h1 style='text-align: center; color: white; margin-bottom: 30px;'>
 plaintext = st.text_area("Masukkan Teks (Plaintext/Ciphertext):", height=100)
 
 # Konfigurasi Kunci
-st.markdown("### 🔑 Konfigurasi Kunci")
+st.markdown("### Konfigurasi Kunci")
 col_k1, col_k2, col_k3 = st.columns(3)
 
 with col_k1:
