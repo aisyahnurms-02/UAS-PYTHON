@@ -4,6 +4,24 @@ import math
 # --- 1. CONFIG ---
 st.set_page_config(page_title="Kriptografi", layout="centered")
 
+st.markdown("""
+    <style>
+    /* 1. Background Halaman Utama (Luar Kotak) - Tetap Ungu */
+    .stApp {
+        background: linear-gradient(180deg, #6a11cb 0%, #2575fc 100%);
+        background-attachment: fixed;
+    }
+
+    /* 2. Mengatur Container Utama menjadi "KOTAK BESAR" (Card) */
+    div.block-container {
+        background-color: rgba(255, 255, 255, 0.95); /* Putih sedikit transparan */
+        padding: 3rem;       /* Jarak dalam kotak */
+        border-radius: 25px; /* Sudut membulat */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Bayangan hitam di belakang kotak */
+        max-width: 700px;    /* Lebar maksimal kotak agar terlihat rapi */
+        margin-top: 2rem;
+    }
+
 # --- 2. CSS (WARNA KOTAK & TEKS DIPERBAIKI) ---
 st.markdown("""
     <style>
