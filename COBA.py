@@ -208,7 +208,7 @@ st.markdown("<p style='text-align: center; margin-top: -20px; color: #666 !impor
 # Area Input Plaintext
 input_text = st.text_area("Masukkan Teks (Plaintext / Ciphertext)", height=120, placeholder="Ketik pesan rahasia di sini...")
 
-st.markdown("### ⚙️ Konfigurasi Kunci")
+st.markdown("### Konfigurasi Kunci")
 
 # Kolom untuk Input Kunci (3 Kolom Sejajar)
 col_k1, col_k2, col_k3 = st.columns(3)
