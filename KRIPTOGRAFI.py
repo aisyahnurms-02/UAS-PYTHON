@@ -215,7 +215,7 @@ col_btn1, col_btn2 = st.columns(2)
 action = None
 with col_btn1:
     # Tombol Enkripsi (Ungu)
-    if st.button("Enkripsi 🔒"):
+    if st.button(" Enkripsi 🔒"):
         action = "encrypt"
 
 with col_btn2:
