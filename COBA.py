@@ -8,7 +8,7 @@ st.set_page_config(
     page_icon="💜"
 )
 
-# --- CUSTOM CSS (UNTUK TAMPILAN KARTU & GRADASI) ---
+# --- CUSTOM CSS ---
 st.markdown("""
     <style>
     /* 1. Background Utama: Gradasi Ungu Gelap ke Putih */
@@ -18,7 +18,7 @@ st.markdown("""
         background-attachment: fixed;
     }
 
-    /* 2. Mengubah Container Utama menjadi "Kartu Putih" di tengah */
+    /* 2. Kartu Putih di Tengah */
     div[data-testid="block-container"] {
         background-color: #FFFFFF;
         padding: 3rem 3rem;
@@ -28,7 +28,7 @@ st.markdown("""
         max-width: 700px;
     }
 
-    /* 3. Styling Judul */
+    /* 3. Judul */
     h1 {
         color: #333333;
         text-align: center;
@@ -38,7 +38,6 @@ st.markdown("""
         margin-bottom: 0.5rem;
     }
     
-    /* Subjudul */
     .subtitle {
         text-align: center;
         color: #666;
@@ -46,15 +45,14 @@ st.markdown("""
         margin-bottom: 2rem;
     }
 
-    /* 4. Styling Label Input */
+    /* 4. Input Label */
     .stTextInput > label, .stTextArea > label {
         color: #333333 !important;
         font-weight: bold;
         font-size: 1rem;
     }
 
-    /* 5. Tombol (Hijau & Biru) */
-    /* Tombol Enkripsi (Primary - Hijau) */
+    /* 5. Tombol */
     div.stButton > button[kind="primary"] {
         background-color: #28a745;
         color: white;
@@ -67,10 +65,8 @@ st.markdown("""
     }
     div.stButton > button[kind="primary"]:hover {
         background-color: #218838;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
-    /* Tombol Dekripsi/Reset (Secondary - Biru) */
     div.stButton > button[kind="secondary"] {
         background-color: #007bff;
         color: white;
@@ -83,10 +79,9 @@ st.markdown("""
     }
     div.stButton > button[kind="secondary"]:hover {
         background-color: #0069d9;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
-    /* 6. Kotak Hasil (Abu-abu dengan border dashed) */
+    /* 6. Kotak Hasil */
     .result-label {
         font-weight: bold;
         color: #333;
@@ -106,23 +101,18 @@ st.markdown("""
         word-wrap: break-word;
     }
 
-    /* 7. Footer */
-    .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: #4A148C; /* Ungu Footer */
-        color: white;
+    /* 7. Footer / Credit Text (Di bawah hasil) */
+    .credit-text {
         text-align: center;
-        padding: 12px;
-        font-size: 14px;
-        font-weight: 500;
-        letter-spacing: 1px;
-        z-index: 9999;
+        color: #888;
+        font-size: 12px;
+        font-style: italic;
+        margin-top: 25px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
     }
     
-    /* Hide default elements */
+    /* Sembunyikan elemen bawaan */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -130,7 +120,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- LOGIKA KRIPTOGRAFI (CORE LOGIC) ---
+# --- LOGIKA KRIPTOGRAFI ---
 
 def hitung_shift_key(judul_lagu, durasi_menit):
     jumlah_huruf = len(judul_lagu.replace(" ", ""))
@@ -191,14 +181,13 @@ def enkripsi_ekp(text):
 
 # --- UI VISUAL ---
 
-# Judul Utama
+# 1. Header
 st.markdown("<h1>Kriptografi Aisyah</h1>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Metode: Lagu Subtitusi + Transposisi + EKP</div>", unsafe_allow_html=True)
 
-# Input Text Area
+# 2. Input Area
 plaintext = st.text_area("Masukkan Teks (Plaintext/Ciphertext):", height=100)
 
-# Input Kunci (Disusun rapi agar tidak memenuhi tempat)
 st.markdown("<p style='font-weight:bold; margin-bottom:5px; color:#333;'>Konfigurasi Kunci:</p>", unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
 with c1:
@@ -210,10 +199,12 @@ with c3:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Tombol
+# 3. Buttons
 col_btn1, col_btn2 = st.columns(2)
 
-hasil_akhir = "..."
+# Inisialisasi session state untuk menyimpan hasil
+if 'hasil' not in st.session_state:
+    st.session_state['hasil'] = "..."
 
 with col_btn1:
     if st.button("Enkripsi", type="primary"):
@@ -231,10 +222,7 @@ with col_btn2:
         st.session_state['hasil'] = "..."
         st.rerun()
 
-# Menampilkan Hasil
-if 'hasil' not in st.session_state:
-    st.session_state['hasil'] = "..."
-
+# 4. Result Area
 st.markdown("<div class='result-label'>Hasil:</div>", unsafe_allow_html=True)
 st.markdown(f"""
     <div class="result-box">
@@ -242,12 +230,9 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# Spacer
-st.markdown("<br><br>", unsafe_allow_html=True)
-
-# --- FOOTER ---
+# 5. Footer (Credit Text) - Ditempatkan tepat di bawah hasil
 st.markdown("""
-    <div class="footer">
+    <div class="credit-text">
         create by Aisyah Nur Maya Silviyani
     </div>
 """, unsafe_allow_html=True)
