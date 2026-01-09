@@ -1,153 +1,260 @@
 import streamlit as st
 import math
 
-# --- LOGIKA 1: SUBSTITUSI (MODIFIED CAESAR) ---
+# --- KONFIGURASI HALAMAN & CSS (TEMA UNGU) ---
+st.set_page_config(page_title="Crypto EKP Aisyah", layout="wide", page_icon="💜")
+
+# Custom CSS untuk Tema Ungu & Putih
+st.markdown("""
+    <style>
+    /* Mengubah warna background utama menjadi putih bersih */
+    .stApp {
+        background-color: #FFFFFF;
+        color: #333333;
+    }
+    
+    /* Mengubah warna Sidebar menjadi Ungu Muda (Lavender) */
+    [data-testid="stSidebar"] {
+        background-color: #F3E5F5;
+        border-right: 2px solid #E1BEE7;
+    }
+    
+    /* Mengubah warna Judul dan Header menjadi Ungu Tua */
+    h1, h2, h3, h4, h5, h6 {
+        color: #4A148C !important;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    
+    /* Styling Tombol (Button) menjadi Ungu */
+    div.stButton > button {
+        background-color: #7B1FA2;
+        color: white;
+        border-radius: 10px;
+        border: none;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        width: 100%;
+    }
+    div.stButton > button:hover {
+        background-color: #4A148C; /* Ungu lebih gelap saat hover */
+        border: 2px solid #BA68C8;
+        color: #fff;
+    }
+    
+    /* Styling Input Field agar border ungu */
+    div[data-baseweb="input"] {
+        border: 1px solid #CE93D8;
+        border-radius: 8px;
+    }
+    
+    /* Styling Text Area */
+    div[data-baseweb="textarea"] {
+        border: 1px solid #CE93D8;
+        border-radius: 8px;
+    }
+    
+    /* Custom Box untuk Hasil */
+    .custom-box {
+        background-color: #F8F0FC; /* Ungu sangat muda */
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 5px solid #8E24AA;
+        margin-bottom: 20px;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    /* Footer Style */
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #4A148C;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        z-index: 999;
+    }
+    
+    /* Spacer untuk konten agar tidak tertutup footer */
+    .spacer {
+        height: 50px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- LOGIKA KRIPTOGRAFI (SAMA SEPERTI SEBELUMNYA) ---
+
 def hitung_shift_key(judul_lagu, durasi_menit):
-    # 1. Hitung jumlah huruf judul lagu (hapus spasi agar akurat)
     jumlah_huruf = len(judul_lagu.replace(" ", ""))
-    
-    # 2. Proses durasi (hilangkan titik, ubah ke integer)
-    # Contoh: "4.14" -> "414" -> 414
     durasi_bersih = durasi_menit.replace(".", "")
-    if not durasi_bersih.isdigit():
-        return 0, "Error: Durasi harus berupa angka (contoh: 4.14)"
-    nilai_durasi = int(durasi_bersih)
     
-    # 3. Rumus: (Jumlah Huruf + Nilai Durasi) MOD 26
+    if not durasi_bersih.isdigit():
+        return 0, "⚠️ Error: Durasi harus angka."
+        
+    nilai_durasi = int(durasi_bersih)
     total = jumlah_huruf + nilai_durasi
     shift = total % 26
     
-    return shift, f"Rumus: ({jumlah_huruf} huruf + {nilai_durasi}) % 26 = {shift}"
+    # Penjelasan detail untuk UI
+    penjelasan = f"""
+    **Rumus:** (Huruf Lagu + Menit) mod 26
+    <br>• Huruf '{judul_lagu}': {jumlah_huruf}
+    <br>• Menit '{durasi_menit}': {nilai_durasi}
+    <br>• Total: {total}
+    <br>• **Shift Key:** {total} mod 26 = **{shift}**
+    """
+    return shift, penjelasan
 
 def enkripsi_substitusi(text, shift):
     result = ""
     for char in text:
         if char.isalpha():
             start = ord('A') if char.isupper() else ord('a')
-            # Geser karakter
             shifted_char = chr((ord(char) - start + shift) % 26 + start)
             result += shifted_char
         else:
             result += char
     return result
 
-# --- LOGIKA 2: TRANSPOSISI (COLUMNAR) ---
 def enkripsi_transposisi(text, key):
-    # Key harus string angka, misal "3142"
     if not key.isdigit():
-        return text # Kembalikan text asli jika key salah
+        return text
     
     msg_len = float(len(text))
     msg_lst = list(text)
-    key_lst = list(key) # ['3', '1', '4', '2']
-    
-    # Mengurutkan key untuk menentukan urutan baca kolom
-    # Col_order akan berisi index asli. Misal key "3142" -> sorted "1234"
-    # Urutan pengambilan kolom berdasarkan nilai angkanya
-    
-    # Hitung jumlah kolom dan baris
+    key_lst = list(key)
     num_cols = len(key)
     num_rows = int(math.ceil(msg_len / num_cols))
-    
-    # Isi padding jika kurang
     num_empty = (num_rows * num_cols) - len(msg_lst)
-    msg_lst.extend(['_'] * num_empty) # Gunakan _ sebagai padding
+    msg_lst.extend(['_'] * num_empty)
     
-    # Buat matrix
     matrix = [msg_lst[i * num_cols: (i + 1) * num_cols] for i in range(num_rows)]
-    
     ciphertext = ""
-    # Baca kolom berdasarkan urutan angka kunci (1 dulu, lalu 2, dst)
-    # Kita butuh index dari key yang sudah diurutkan
     key_with_index = sorted([(k, i) for i, k in enumerate(key_lst)])
     
     for _, k_index in key_with_index:
         for row in matrix:
             ciphertext += row[k_index]
-            
     return ciphertext
 
-# --- LOGIKA 3: METODE EKP (CUSTOM SIMBOL) ---
 def enkripsi_ekp(text):
-    # Ini adalah simulasi EKP (Ekspansi Karakter). 
-    # Logika: Mengubah 1 huruf menjadi simbol/kombinasi aneh.
-    # Anda bisa mengedit mapping ini sesuai aturan "Ekspansi" Anda.
+    # Mapping Simbol Unik (Nuansa Alien/Kriptik)
     ekp_map = {
-        'A': '∆', 'B': 'ß', 'C': '©', 'D': '∂', 'E': '€',
-        'F': 'ƒ', 'G': '6', 'H': '#', 'I': '!', 'J': '¿',
-        'K': 'x', 'L': '£', 'M': 'µ', 'N': 'π', 'O': 'Ø',
-        'P': '¶', 'Q': '9', 'R': '®', 'S': '$', 'T': '†',
-        'U': 'µ', 'V': '√', 'W': '∑', 'X': '×', 'Y': '¥', 'Z': 'Ω',
-        ' ': '_',  # Spasi jadi underscore
-        '_': '~'   # Padding transposisi jadi tilde
+        'A': '@1', 'B': '&2*', 'C': '!3%', 'D': '^4$', 'E': '~5=',
+        'F': '+6?', 'G': '<7>', 'H': '#8', 'I': '9!', 'J': '{1}0',
+        'K': '1/1\', 'L': '`12~', 'M': ':1;3', 'N': '1,5<', 'O': 'Ø16',
+        'P': '_1-7', 'Q': '1=8+', 'R': '1®9', 'S': '#2#0', 'T': '2@1@',
+        'U': '**', 'V': '%√', 'W': '&∑', 'X': '×!!', 'Y': '^¥^', 'Z': 'Ω$',
+        ' ': '_', '_': '~'
     }
-    
     hasil = ""
     for char in text:
         upper_char = char.upper()
         if upper_char in ekp_map:
             hasil += ekp_map[upper_char]
         else:
-            # Jika tidak ada di map, ubah jadi hex code agar terlihat kriptik
-            hasil += f"\\x{ord(char):02x}"
-            
+            hasil += char
     return hasil
 
-# --- UI STREAMLIT ---
-st.set_page_config(page_title="Crypto Model EKP", layout="wide")
+# --- UI UTAMA ---
 
-st.title("🔐 Kriptografi Hybrid: Substitusi + Transposisi + EKP")
-st.write("Dibuat khusus untuk model kriptografi custom.")
+st.title("KRIPTOGRAFI")
+st.markdown("<h5 style='color: #7B1FA2;'>Kombinasi Substitusi Lagu, Transposisi, dan Simbol</h5>", unsafe_allow_html=True)
+st.markdown("---")
 
-with st.sidebar:
-    st.header("Konfigurasi Kunci")
-    st.markdown("### 1. Kunci Substitusi (Lagu)")
-    judul_lagu = st.text_input("Judul Lagu", "Separuh Nafas")
-    durasi = st.text_input("Durasi (Contoh: 4.14)", "4.14")
-    
-    st.markdown("---")
-    st.markdown("### 2. Kunci Transposisi")
-    kunci_transposisi = st.text_input("Kunci Angka (Maks 4 digit)", "3142", max_chars=4)
+# Layout Kolom untuk Input
+col_input1, col_input2 = st.columns([1, 2])
 
-st.header("Input Pesan")
-plaintext = st.text_area("Masukkan Plaintext", "AISYAH NUR MAYA")
+with col_input1:
+    st.markdown("### Konfigurasi Kunci")
+    with st.container():
+        # Input Judul Lagu
+        judul_lagu = st.text_input("🎵 Judul Lagu", "Separuh Nafas")
+        # Input Durasi
+        durasi = st.text_input("⏱️ Durasi (misal 4.14)", "4.14")
+        # Input Kunci Transposisi
+        kunci_transposisi = st.text_input("🔢 Kunci Transposisi (Maks 4 digit)", "3142", max_chars=4)
 
-if st.button("PROSES ENKRIPSI"):
+with col_input2:
+    st.markdown("### Pesan Rahasia")
+    plaintext = st.text_area("Masukkan Plaintext di sini:", "AISYAH NUR MAYA", height=200)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Tombol Proses (Full Width)
+if st.button(" PROSES ENKRIPSI SEKARANG "):
     if not plaintext or not judul_lagu or not durasi or not kunci_transposisi:
-        st.error("Mohon lengkapi semua input!")
+        st.error("⚠️ Mohon lengkapi semua kolom input!")
     else:
-        st.markdown("---")
-        
-        # --- TAHAP 1 ---
+        # --- PROSES ---
         shift_val, info_rumus = hitung_shift_key(judul_lagu, durasi)
+        
+        # 1. Substitusi
         cipher_1 = enkripsi_substitusi(plaintext, shift_val)
         
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.subheader("1. Tahap Substitusi")
-            st.info(info_rumus)
-            st.success(f"Shift: {shift_val}")
-            st.code(cipher_1)
-            
-        # --- TAHAP 2 ---
+        # 2. Transposisi
         cipher_2 = enkripsi_transposisi(cipher_1, kunci_transposisi)
         
-        with col2:
-            st.subheader("2. Tahap Transposisi")
-            st.info(f"Menggunakan Key: {kunci_transposisi}")
-            st.warning("Padding '_' ditambahkan jika perlu.")
-            st.code(cipher_2)
-            
-        # --- TAHAP 3 ---
+        # 3. EKP
         cipher_final = enkripsi_ekp(cipher_2)
         
-        with col3:
-            st.subheader("3. Tahap EKP (Final)")
-            st.info("Metode Ekspansi Karakter Polialfanumerik")
-            st.error("Output Simbol:")
-            st.code(cipher_final)
-
         st.markdown("---")
-        st.markdown("### Hasil Akhir:")
-        st.text_area("Copy hasil di sini:", cipher_final, height=100)
+        st.subheader("Hasil Enkripsi Bertahap")
+        
+        col_res1, col_res2, col_res3 = st.columns(3)
+        
+        with col_res1:
+            st.markdown(f"""
+            <div class="custom-box">
+                <h4 style="color:#4A148C;">1. Metode Substitusi</h4>
+                <div style="font-size:0.9em; color:#555;">{info_rumus}</div>
+                <hr style="border-top: 1px dashed #BA68C8;">
+                <b>Hasil:</b><br>
+                <code style="color:#D500F9;">{cipher_1}</code>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with col_res2:
+            st.markdown(f"""
+            <div class="custom-box">
+                <h4 style="color:#4A148C;">2. Metode Transposisi</h4>
+                <div style="font-size:0.9em; color:#555;">
+                Menggunakan kunci kolom: <b>{kunci_transposisi}</b><br>
+                Padding karakter: '_'
+                </div>
+                <hr style="border-top: 1px dashed #BA68C8;">
+                <b>Hasil:</b><br>
+                <code style="color:#D500F9;">{cipher_2}</code>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with col_res3:
+            st.markdown(f"""
+            <div class="custom-box" style="background-color: #E1BEE7; border-left: 5px solid #4A148C;">
+                <h4 style="color:#4A148C;">3. Metode EKP (Final)</h4>
+                <div style="font-size:0.9em; color:#555;">
+                Ekspansi ke simbol Polialfanumerik.
+                </div>
+                <hr style="border-top: 1px dashed #BA68C8;">
+                <b>OUTPUT AKHIR:</b><br>
+                <code style="color:#000; font-weight:bold; font-size:1.2em;">{cipher_final}</code>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Area Copy Hasil Akhir
+        st.markdown("### 📋 Salin Hasil Akhir")
+        st.text_area("Ciphertext:", cipher_final, height=70)
+
+# Spacer agar konten tidak tertutup footer
+st.markdown('<div class="spacer"></div>', unsafe_allow_html=True)
+
+# --- FOOTER ---
+st.markdown("""
+    <div class="footer">
+        create by Aisyah Nur Maya Silviyani
+    </div>
+""", unsafe_allow_html=True)
