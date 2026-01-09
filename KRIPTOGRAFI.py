@@ -2,7 +2,7 @@ import streamlit as st
 import math
 
 # --- KONFIGURASI HALAMAN & CSS (TEMA UNGU) ---
-st.set_page_config(page_title="Crypto EKP Aisyah", layout="wide", page_icon="💜")
+st.set_page_config(page_title="Crypto Aisyah", layout="wide", page_icon="💜")
 
 # Custom CSS untuk Tema Ungu & Putih
 st.markdown("""
@@ -163,7 +163,6 @@ def enkripsi_ekp(text):
 # --- UI UTAMA ---
 
 st.title("KRIPTOGRAFI")
-st.markdown("<h5 style='color: #7B1FA2;'>Kombinasi Substitusi Lagu, Transposisi, dan Simbol</h5>", unsafe_allow_html=True)
 st.markdown("---")
 
 # Layout Kolom untuk Input
